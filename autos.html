@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autos | Mecars Multimarcas</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+  <img src="assets/img/mecars.logo.png" alt="Mecars" />
+</a>
+
+
+      <nav class="nav">
+        <a class="nav__link" href="index.html">Inicio</a>
+        <a class="nav__link nav__cta" href="autos.html">Stock</a>
+        <a class="nav__link" href="clientes.html">Clientes</a>
+        <a class="nav__link" href="contacto.html">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>Catálogo de autos</h2>
+          <p class="muted" style="margin:6px 0 0">Filtrá por marca, año y precio. (Por ahora es demo, después lo conectamos a la base.)</p>
+        </div>
+        <a class="link" href="contacto.html">Pedir cotización →</a>
+      </div>
+
+      <!-- Filtros -->
+      <section class="filters">
+        <div class="filters__row">
+          <label class="field">
+            <span class="field__label">Buscar</span>
+            <input id="q" class="input" type="text" placeholder="Ej: Golf, Ranger, 208..." />
+          </label>
+
+          <label class="field">
+            <span class="field__label">Marca</span>
+            <select id="brand" class="input">
+              <option value="">Todas</option>
+              <option>Volkswagen</option>
+              <option>Renault</option>
+              <option>Peugeot</option>
+              <option>Ford</option>
+              <option>Toyota</option>
+              <option>Fiat</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Año (desde)</span>
+            <select id="yearMin" class="input">
+              <option value="">Cualquiera</option>
+              <option>2010</option>
+              <option>2012</option>
+              <option>2014</option>
+              <option>2016</option>
+              <option>2018</option>
+              <option>2020</option>
+              <option>2022</option>
+              <option>2024</option>
+              <option>2025</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Precio (hasta)</span>
+            <select id="priceMax" class="input">
+              <option value="">Sin tope</option>
+              <option value="8000000">$ 8.000.000</option>
+              <option value="12000000">$ 12.000.000</option>
+              <option value="18000000">$ 18.000.000</option>
+              <option value="25000000">$ 25.000.000</option>
+              <option value="35000000">$ 35.000.000</option>
+              <option value="50000000">$ 50.000.000</option>
+            </select>
+          </label>
+
+          <div class="filters__actions">
+            <button id="reset" class="btn btn--ghost" type="button">Limpiar</button>
+            <button id="apply" class="btn btn--primary" type="button">Aplicar</button>
+          </div>
+        </div>
+
+        <div class="filters__meta">
+          <span id="count" class="badge">0 autos</span>
+          <span class="muted">Tip: después esto lo hacemos dinámico con MySQL.</span>
+        </div>
+      </section>
+
+      <!-- Grid -->
+      <section>
+        <div id="grid" class="grid"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <div class="brand brand--footer">Mecars<span>Multimarcas</span></div>
+        <p class="muted">Compra/venta • Consignación • Transferencias</p>
+      </div>
+      <div class="footer__links">
+        <a href="autos.html">Autos</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Datos demo (después se reemplaza por DB)
+   // Autos desde la base de datos
+let cars = [];
+
+async function loadCars(){
+  const r = await fetch("api/autos_list.php");
+  const j = await r.json();
+
+cars = (j.data || []).map(a => ({
+  id: a.id,
+  title: `${a.marca} ${a.modelo}`,
+  brand: a.marca,
+  year: a.anio,
+  km: Number(a.km ?? 0),
+  trans: a.transmision ?? "—",
+  fuel: a.combustible ?? "—",
+  price: Number(a.precio ?? 0),
+  img: a.imagen ?? "",
+  tags: [a.estado, a.color].filter(Boolean)
+}));
+
+  applyFilters();
+}
+
+
+
+
+    const $ = (id) => document.getElementById(id);
+
+    function money(n){
+      if (n == null) return "$ Consultar";
+      return n.toLocaleString("es-AR", { style:"currency", currency:"ARS", maximumFractionDigits:0 });
+    }
+
+  function card(car){
+  const img = car.img && car.img !== "" ? car.img : "assets/img/placeholder.jpg";
+  const title = car.title;
+
+  return `
+    <article class="car">
+      <a href="auto.html?id=${encodeURIComponent(car.id)}" style="text-decoration:none; color:inherit; display:block">
+        <div class="car__img">
+          <img src="${img}" alt="${title}" />
+        </div>
+
+        <div class="car__body">
+          <h3>${title}</h3>
+
+          <p class="muted">
+            ${car.year} • ${car.km.toLocaleString("es-AR")} km • ${car.trans} • ${car.fuel}
+          </p>
+
+          <div class="car__meta">
+            ${car.tags.map(t => `<span>${t}</span>`).join("")}
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0 12px;">
+            <div style="font-weight:900; font-size:18px;">
+              ${money(car.price)}
+            </div>
+            <span class="badge">${car.brand}</span>
+          </div>
+
+          <div class="btn btn--primary w-full" style="text-align:center">
+            Ver más
+          </div>
+        </div>
+      </a>
+    </article>
+  `;
+}
+
+
+
+    function applyFilters(){
+      const q = ($("q").value || "").trim().toLowerCase();
+      const brand = $("brand").value;
+      const yearMin = parseInt($("yearMin").value || "0", 10);
+      const priceMax = parseInt($("priceMax").value || "0", 10);
+
+      const filtered = cars.filter(c => {
+        const matchQ = !q || c.title.toLowerCase().includes(q) || c.brand.toLowerCase().includes(q);
+        const matchBrand = !brand || c.brand === brand;
+        const matchYear = !yearMin || c.year >= yearMin;
+        const matchPrice = !priceMax || c.price <= priceMax;
+        return matchQ && matchBrand && matchYear && matchPrice;
+      });
+
+      $("grid").innerHTML = filtered.map(card).join("") || `
+        <div class="card" style="grid-column:1/-1">
+          <h3 style="margin:0 0 8px">No hay resultados</h3>
+          <p class="muted" style="margin:0">Probá ajustando filtros o limpiando la búsqueda.</p>
+        </div>
+      `;
+
+      $("count").textContent = `${filtered.length} autos`;
+    }
+
+    function resetFilters(){
+      $("q").value = "";
+      $("brand").value = "";
+      $("yearMin").value = "";
+      $("priceMax").value = "";
+      applyFilters();
+    }
+
+    $("apply").addEventListener("click", applyFilters);
+    $("reset").addEventListener("click", resetFilters);
+    $("q").addEventListener("input", () => { clearTimeout(window.__t); window.__t = setTimeout(applyFilters, 120); });
+
+    // render inicial
+    loadCars();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingresar | Mecars</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="container header__inner">
+    <a class="brand brand--logo" href="index.html">
+      <img src="assets/img/mecars.logo.png" alt="Mecars">
+    </a>
+  </div>
+</header>
+
+<main class="section">
+  <div class="container" style="display:grid;place-items:center;">
+    <section class="card" style="max-width:420px;width:100%;">
+      <h2>Panel Mecars</h2>
+      <p class="muted">Acceso administrativo</p>
+
+      <form id="form" class="form">
+        <label class="field">
+          <span class="field__label">Usuario</span>
+          <input class="input" id="usuario" required>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Contraseña</span>
+          <input class="input" id="password" type="password" required>
+        </label>
+
+        <button class="btn btn--primary w-full" type="submit">
+          Ingresar
+        </button>
+
+        <p id="error" class="muted" style="display:none;margin-top:10px;"></p>
+      </form>
+    </section>
+  </div>
+</main>
+
+<script>
+const form = document.getElementById("form");
+const error = document.getElementById("error");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  error.style.display = "none";
+
+  try {
+    const res = await fetch("api/auth_login.php", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        usuario: document.getElementById("usuario").value,
+        password: document.getElementById("password").value
+      })
+    });
+
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+
+    window.location.href = "clientes.html";
+
+  } catch (err) {
+    error.textContent = err.message;
+    error.style.display = "block";
+  }
+});
+</script>
+
+</body>
+</html>

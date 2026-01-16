@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clientes | Panel - Mecars</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+  <img src="assets/img/mecars.logo.png" alt="Mecars" />
+</a>
+
+
+      <nav class="nav">
+        <a class="nav__link" href="index.html">Inicio</a>
+        <a class="nav__link" href="autos.html">Stock</a>
+        <a class="nav__link nav__cta" href="clientes.html">Clientes</a>
+        <a class="nav__link" href="contacto.html">Contacto</a>
+        <a class="btn btn--ghost" href="leads.html">Ver Leads</a>
+
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>Panel de clientes</h2>
+          <p class="muted" style="margin:6px 0 0">
+            CLIENTES MECARS 
+          </p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <span id="total" class="badge">0 clientes</span>
+          <button id="export" class="btn btn--ghost" type="button">Exportar CSV</button>
+          <button id="seed" class="btn btn--ghost" type="button">Cargar ejemplo</button>
+          <button id="logout" class="btn btn--ghost" type="button">Salir</button>
+
+        </div>
+      </div>
+
+      <section class="panel">
+        <!-- Form -->
+        <div class="card">
+          <h3 style="margin:0 0 12px">Agregar cliente</h3>
+
+          <form id="form" class="form">
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Nombre</span>
+                <input class="input" id="name" required placeholder="Ej: Juan Pérez" />
+              </label>
+              <label class="field">
+                <span class="field__label">Teléfono</span>
+                <input class="input" id="phone" required placeholder="Ej: 11 2345 6789" />
+              </label>
+            </div>
+
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Email (opcional)</span>
+                <input class="input" id="email" type="email" placeholder="Ej: juan@gmail.com" />
+              </label>
+              <label class="field">
+                <span class="field__label">Fecha de nacimiento</span>
+                <input class="input" id="dob" type="date" />
+              </label>
+            </div>
+
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Fecha de compra</span>
+                <input class="input" id="buyDate" type="date" />
+              </label>
+              <label class="field">
+                <span class="field__label">Auto</span>
+                <input class="input" id="car" placeholder="Ej: Volkswagen Golf 2016" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Notas</span>
+              <textarea class="input textarea" id="notes" rows="4" placeholder="Ej: quiere financiar / entrega / etc."></textarea>
+            </label>
+
+            <div class="form__actions">
+              <button class="btn btn--primary" type="submit">Guardar cliente</button>
+              <button class="btn btn--ghost" id="clear" type="button">Limpiar</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card">
+          <div class="tableHead">
+            <div>
+              <h3 style="margin:0 0 6px">Listado</h3>
+              <p class="muted" style="margin:0">Buscá por nombre, teléfono, email o auto.</p>
+            </div>
+            <label class="field" style="min-width:260px">
+              <span class="field__label">Buscar</span>
+              <input class="input" id="q" placeholder="Ej: Golf, Juan, 11..." />
+            </label>
+          </div>
+
+          <div class="tableWrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
+                  <th>Email</th>
+                  <th>Nac.</th>
+                  <th>Compra</th>
+                  <th>Auto</th>
+                  <th style="width:120px">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="empty" class="empty" style="display:none">
+            <h3 style="margin:0 0 8px">Todavía no hay clientes</h3>
+            <p class="muted" style="margin:0">Agregá el primero desde el formulario.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <div class="brand brand--footer">Mecars<span>Multimarcas</span></div>
+        <p class="muted">Compra/venta • Consignación • Transferencias</p>
+      </div>
+      <div class="footer__links">
+        <a href="autos.html">Autos</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    async function ensureAuth(){
+  try{
+    const r = await fetch("api/auth_me.php");
+    const j = await r.json();
+    if(!j.ok) throw new Error();
+  }catch(e){
+    window.location.href = "login.html";
+  }
+}
+ensureAuth();
+
+    const STORAGE_KEY = "tuAgencia_clientes_v1";
+    const $ = (id) => document.getElementById(id);
+
+    let clients = load();
+    render();
+
+    function load(){
+      try{
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      }catch(e){
+        return [];
+      }
+    }
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+    }
+
+    function uid(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function esc(s){
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;");
+    }
+
+    function fmtDate(iso){
+      if(!iso) return "";
+      const [y,m,d] = iso.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
+    function getForm(){
+      return {
+        id: uid(),
+        name: $("name").value.trim(),
+        phone: $("phone").value.trim(),
+        email: $("email").value.trim(),
+        dob: $("dob").value,
+        buyDate: $("buyDate").value,
+        car: $("car").value.trim(),
+        notes: $("notes").value.trim(),
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function clearForm(){
+      ["name","phone","email","dob","buyDate","car","notes"].forEach(id => $(id).value = "");
+    }
+
+    function matches(c, q){
+      if(!q) return true;
+      const t = (c.name+" "+c.phone+" "+c.email+" "+c.car).toLowerCase();
+      return t.includes(q.toLowerCase());
+    }
+
+    function render(){
+      const q = ($("q")?.value || "").trim();
+      const list = clients.filter(c => matches(c, q));
+
+      $("total").textContent = `${clients.length} clientes`;
+
+      const tbody = $("tbody");
+      tbody.innerHTML = "";
+
+      if(list.length === 0){
+        $("empty").style.display = clients.length === 0 ? "block" : "block";
+      } else {
+        $("empty").style.display = "none";
+      }
+
+      list.forEach(c => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <div class="cellMain">${esc(c.name)}</div>
+            <div class="cellSub">${esc(c.notes).slice(0, 40)}${c.notes?.length > 40 ? "…" : ""}</div>
+          </td>
+          <td>${esc(c.phone)}</td>
+          <td>${esc(c.email)}</td>
+          <td>${esc(fmtDate(c.dob))}</td>
+          <td>${esc(fmtDate(c.buyDate))}</td>
+          <td>${esc(c.car)}</td>
+          <td>
+            <div class="rowActions">
+              <button class="btn btn--ghost btn-sm" data-edit="${c.id}">Editar</button>
+              <button class="btn btn--ghost btn-sm" data-del="${c.id}">Borrar</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Eventos de acciones
+      tbody.querySelectorAll("[data-del]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-del");
+          const c = clients.find(x => x.id === id);
+          if(!c) return;
+          if(confirm(`Borrar a "${c.name}"?`)){
+            clients = clients.filter(x => x.id !== id);
+            save(); render();
+          }
+        });
+      });
+
+      tbody.querySelectorAll("[data-edit]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-edit");
+          const c = clients.find(x => x.id === id);
+          if(!c) return;
+
+          // Cargar en form
+          $("name").value = c.name || "";
+          $("phone").value = c.phone || "";
+          $("email").value = c.email || "";
+          $("dob").value = c.dob || "";
+          $("buyDate").value = c.buyDate || "";
+          $("car").value = c.car || "";
+          $("notes").value = c.notes || "";
+
+          // modo edición
+          $("form").dataset.editing = id;
+          $("form").querySelector("button[type='submit']").textContent = "Guardar cambios";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      });
+    }
+
+    // Submit
+    $("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const name = $("name").value.trim();
+      const phone = $("phone").value.trim();
+      if(!name || !phone){
+        alert("Completá nombre y teléfono 🙂");
+        return;
+      }
+
+      const editingId = $("form").dataset.editing;
+      if(editingId){
+        const i = clients.findIndex(x => x.id === editingId);
+        if(i !== -1){
+          clients[i] = { ...clients[i],
+            name, phone,
+            email: $("email").value.trim(),
+            dob: $("dob").value,
+            buyDate: $("buyDate").value,
+            car: $("car").value.trim(),
+            notes: $("notes").value.trim(),
+            updatedAt: new Date().toISOString()
+          };
+        }
+        delete $("form").dataset.editing;
+        $("form").querySelector("button[type='submit']").textContent = "Guardar cliente";
+      } else {
+        clients.unshift(getForm());
+      }
+
+      save();
+      clearForm();
+      render();
+    });
+
+    $("clear").addEventListener("click", () => {
+      clearForm();
+      delete $("form").dataset.editing;
+      $("form").querySelector("button[type='submit']").textContent = "Guardar cliente";
+    });
+
+    $("q").addEventListener("input", () => {
+      clearTimeout(window.__t3);
+      window.__t3 = setTimeout(render, 120);
+    });
+
+    $("seed").addEventListener("click", () => {
+      if(clients.length && !confirm("Esto agrega ejemplos. ¿Querés continuar?")) return;
+
+      clients.unshift(
+        { id: uid(), name:"Juan Pérez", phone:"11 2345 6789", email:"juan@gmail.com", dob:"1990-05-10", buyDate:"2025-12-02", car:"Volkswagen Golf 2016", notes:"Quiere financiar. Llamar a la tarde.", createdAt:new Date().toISOString() },
+        { id: uid(), name:"María López", phone:"11 9988 7766", email:"", dob:"1987-09-21", buyDate:"2024-08-19", car:"Toyota Corolla 2019", notes:"Entrega su auto en parte de pago.", createdAt:new Date().toISOString() }
+      );
+      save(); render();
+    });
+
+    $("export").addEventListener("click", () => {
+      const headers = ["Nombre","Telefono","Email","Nacimiento","Compra","Auto","Notas"];
+      const rows = clients.map(c => [
+        c.name, c.phone, c.email, c.dob, c.buyDate, c.car, (c.notes||"").replaceAll("\n"," ")
+      ]);
+
+      const csv = [headers, ...rows]
+        .map(r => r.map(v => `"${(v ?? "").toString().replaceAll('"','""')}"`).join(","))
+        .join("\n");
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "clientes.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("logout").addEventListener("click", async () => {
+  await fetch("api/auth_logout.php");
+  window.location.href = "login.html";
+});
+
+  </script>
+</body>
+</html>

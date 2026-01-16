@@ -1,0 +1,454 @@
+:root{
+  --bg:#0c0b09;              /* fondo oscuro cálido */
+  --card:#16120c;            /* tarjetas */
+  --soft:#141008;
+  --text:#fff6e8;            /* texto principal */
+  --muted:#c8b9a6;           /* texto secundario */
+  --line:rgba(255,180,80,.15);
+
+  /* 🎯 NARANJA MECARS */
+  --accent:#ff8c1a;          /* naranja principal */
+  --accent2:#ffb347;         /* naranja claro */
+}
+
+
+*{box-sizing:border-box}
+html,body{height:100%}  
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  font-size:17px;
+  line-height:1.6;
+  color:var(--text);
+
+  background-image:
+    radial-gradient(1200px 600px at 30% -10%, rgba(255,140,26,.18), transparent 60%),
+    radial-gradient(900px 500px at 90% 20%, rgba(255,179,71,.12), transparent 55%),
+    linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.70)),
+    url("./assets/img/bg-mecars.jpg");
+
+  background-size: auto, auto, auto, cover;
+  background-position: 30% -10%, 90% 20%, center, center;
+  background-attachment: scroll, scroll, scroll, fixed;
+  background-repeat: no-repeat;
+
+  /* clave: mezcla overlay sin tapar */
+  background-blend-mode: screen, screen, multiply, normal;
+}
+
+
+
+.container{width:min(1100px, 92%); margin:0 auto}
+.muted{color:var(--muted)}
+.w-full{width:100%}
+
+.header{
+  position:sticky; top:0; z-index:10;
+  background: rgba(11,13,18,.65);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.header__inner{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 0;
+}
+.brand{
+  font-weight:800; letter-spacing:.3px;
+  text-decoration:none; color:var(--text);
+  font-size:20px;
+}
+.brand span{color:var(--accent)}
+.brand--footer{font-size:18px}
+
+.nav{display:flex; gap:10px; align-items:center}
+.nav__link{
+  color:var(--muted); text-decoration:none;
+  padding:10px 12px; border-radius:12px;
+  border:1px solid transparent;
+}
+.nav__link:hover{color:var(--text); border-color:var(--line); background:rgba(255,255,255,.03)}
+.nav__cta{color:var(--text); border-color:rgba(79,124,255,.35); background:rgba(79,124,255,.12)}
+
+.hero{padding:52px 0 26px}
+.hero__inner{
+  display:grid;
+  grid-template-columns: 1.4fr .8fr;
+  gap:18px;
+  align-items:stretch;
+}
+.hero__content h1{
+  font-size: clamp(30px, 4vw, 46px);
+  line-height:1.05;
+  margin:0 0 10px;
+}
+.hero__content p{margin:0 0 18px; max-width:58ch}
+.hero__actions{display:flex; gap:10px; flex-wrap:wrap; margin:0 0 18px}
+
+.hero__stats{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:10px;
+}
+.stat{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  padding:12px; border-radius:16px;
+}
+.stat__num{font-weight:800; font-size:18px}
+.stat__label{color:var(--muted); font-size:12px}
+
+.hero__card .card{height:100%}
+
+.section{padding:26px 0}
+.section--soft{background: linear-gradient(180deg, transparent, rgba(255,255,255,.02), transparent)}
+.section__head{
+  display:flex; align-items:end; justify-content:space-between;
+  gap:12px; margin-bottom:14px;
+}
+.section__head h2{margin:0}
+.link{color:var(--accent); text-decoration:none}
+.link:hover{text-decoration:underline}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap:14px;
+}
+
+.card, .car{
+  border:1px solid var(--line);
+  background: rgba(18,22,34,.78);
+  border-radius:18px;
+  padding:16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+
+.card__tag{
+  display:inline-block;
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  background: rgba(0,211,167,.14);
+  border:1px solid rgba(0,211,167,.25);
+  color: var(--text);
+  margin-bottom:10px;
+}
+.card__price{font-size:22px; font-weight:900; margin:10px 0 12px}
+
+.car{padding:0; overflow:hidden}
+/* Imagen dentro de la card */
+.car-card img,
+.card-car img,
+.auto-card img,
+.catalogo .card img,
+.card img.car-img {
+  width: 100%;
+  height: 220px;           /* ajustá si querés más alto/bajo */
+  object-fit: cover;       /* recorta sin deformar */
+  object-position: center; /* centra el recorte */
+  display: block;
+  border-radius: 18px 18px 0 0;
+}
+
+
+.card img {
+  object-fit: contain;
+  background: #0b0f1a;
+}
+
+
+.card .imgWrap,
+.card .media,
+.card .thumb {
+  background: #0b0f1a; /* un azul oscuro lindo */
+}
+
+
+
+.car__body{padding:14px}
+.car__body h3{margin:0 0 6px}
+.car__meta{
+  display:flex; gap:10px; flex-wrap:wrap;
+  color:var(--muted);
+  font-size:12px;
+  margin:10px 0 12px;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:11px 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:var(--text);
+  cursor:pointer;
+  background: rgba(255,255,255,.04);
+}
+.btn:hover{background: rgba(255,255,255,.06)}
+.btn--primary{
+  border-color: rgba(255,140,26,.55);
+  background: linear-gradient(135deg, rgba(255,140,26,.35), rgba(255,179,71,.35));
+}
+.btn--primary:hover{
+  background: linear-gradient(135deg, rgba(255,140,26,.5), rgba(255,179,71,.5));
+}
+
+.btn--ghost{color:var(--text)}
+
+.split{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap:14px;
+  align-items:start;
+}
+.list{margin:12px 0 0; padding-left:18px; color:var(--muted)}
+.list li{margin:8px 0}
+
+.footer{
+  border-top:1px solid var(--line);
+  padding:22px 0;
+  margin-top:20px;
+  background: rgba(0,0,0,.15);
+}
+.footer__inner{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:14px;
+}
+.footer__links{display:flex; gap:14px; flex-wrap:wrap}
+.footer__links a{color:var(--muted); text-decoration:none}
+.footer__links a:hover{color:var(--text)}
+
+@media (max-width: 900px){
+  .hero__inner{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr}
+  .split{grid-template-columns:1fr}
+  .nav{gap:6px; flex-wrap:wrap; justify-content:flex-end}
+}
+
+
+.filters{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.filters__row{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr .6fr .7fr auto;
+  gap:10px;
+  align-items:end;
+}
+
+.field{display:flex; flex-direction:column; gap:6px}
+.field__label{font-size:12px; color:var(--muted)}
+.input{
+  width:100%;
+  padding:11px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.18);
+  color: var(--text);
+  outline: none;
+}
+.input:focus{
+  border-color: rgba(79,124,255,.45);
+  box-shadow: 0 0 0 3px rgba(79,124,255,.12);
+}
+
+.filters__actions{display:flex; gap:10px}
+.filters__meta{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background: rgba(18,22,34,.65);
+  color: var(--muted);
+  font-size:12px;
+}
+
+@media (max-width: 900px){
+  .filters__row{grid-template-columns: 1fr 1fr; }
+  .filters__actions{grid-column:1/-1}
+}
+
+.contact{
+  display:grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap:14px;
+  align-items:start;
+}
+
+.form{display:flex; flex-direction:column; gap:12px}
+.form__row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+
+.textarea{resize: vertical; min-height: 120px}
+
+.form__actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.info{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.info__item{
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  border-radius:16px;
+  padding:12px;
+}
+.info__label{font-size:12px; color:var(--muted); margin-bottom:6px}
+.info__value{font-weight:700}
+
+.mini{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+@media (max-width: 900px){
+  .contact{grid-template-columns:1fr}
+  .form__row{grid-template-columns:1fr}
+}
+
+
+.panel{
+  display:grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap:14px;
+  align-items:start;
+}
+
+.tableHead{
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  align-items:end;
+  margin-bottom:12px;
+  flex-wrap:wrap;
+}
+
+.tableWrap{
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:auto;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  min-width: 820px;
+  background: rgba(0,0,0,.10);
+}
+
+.table th, .table td{
+  text-align:left;
+  padding:12px;
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
+
+.table th{
+  font-size:12px;
+  color:var(--muted);
+  background: rgba(255,255,255,.03);
+  position:sticky;
+  top:0;
+}
+
+.cellMain{font-weight:800}
+.cellSub{font-size:12px; color:var(--muted); margin-top:4px}
+
+.rowActions{display:flex; gap:8px; flex-wrap:wrap}
+.btn-sm{padding:8px 10px; border-radius:12px; font-size:12px}
+
+.empty{
+  border:1px dashed var(--line);
+  border-radius:16px;
+  padding:14px;
+  margin-top:12px;
+  background: rgba(255,255,255,.02);
+}
+
+@media (max-width: 900px){
+  .panel{grid-template-columns:1fr}
+}
+
+.brand--logo img{
+  height:150px;
+  width:auto;
+  display:block;
+}
+
+
+/* ===== IMAGENES DEL CATALOGO (autos.html) ===== */
+.car{
+  padding: 0;
+  overflow: hidden;
+}
+
+.car__img{
+  height: 240px;                 /* subí/bajá esto si querés */
+  overflow: hidden;
+  border-radius: 18px 18px 0 0;
+  background: #0b0f1a;           /* por si la imagen es PNG */
+}
+
+.car__img img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;             /* ✅ recorta sin deformar */
+  object-position: center;
+}
+
+/* NUEVO */
+
+/* === DEBUG / FIX fondo (forzado) === */
+body{
+  background: url("assets/img/bg-mecars.jpg") center / cover no-repeat fixed !important;
+}
+
+/* overlays y acento (sin fixed para no laggear tanto) */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(1200px 600px at 30% -10%, rgba(255,140,26,.22), transparent 60%),
+    radial-gradient(900px 500px at 90% 20%, rgba(255,179,71,.16), transparent 55%),
+    linear-gradient(to bottom, rgba(0,0,0,.45), rgba(0,0,0,.75));
+  pointer-events:none;
+  z-index:-1;
+}
+
+/* === FIX rendimiento: sacá blur global y fixed background en móviles === */
+.header{ backdrop-filter: blur(8px); }
+
+.card, .car, .footer{ backdrop-filter: none !important; }
+
+/* si sigue lento, probá esto también */
+@media (max-width: 900px){
+  body{ background-attachment: scroll !important; }
+}
+

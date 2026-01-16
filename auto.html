@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auto | Mecars</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=2" />
+
+  <style>
+    /* Layout detalle */
+    .detail{
+      display:grid;
+      grid-template-columns: 110px 1.4fr .8fr;
+      gap:14px;
+      align-items:start;
+    }
+    .gallery{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .thumb{
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      background:#0b0f1a;
+      cursor:pointer;
+      opacity:.9;
+    }
+    .thumb:hover{opacity:1}
+    .thumb img{width:100%; height:72px; object-fit:cover; display:block}
+
+    .mainPhoto{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#0b0f1a;
+      min-height: 360px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .mainPhoto img{
+      width:100%;
+      height:100%;
+      min-height:360px;
+      object-fit:contain;   /* tipo agencia: no deforma */
+      display:block;
+      background:#0b0f1a;
+    }
+
+    .specs{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .spec{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .spec b{color:var(--text); display:block; font-size:14px}
+
+    .price{
+      font-size:34px;
+      font-weight:900;
+      margin:8px 0 6px;
+    }
+
+    @media (max-width: 900px){
+      .detail{grid-template-columns: 1fr; }
+      .gallery{flex-direction:row; overflow:auto}
+      .thumb{min-width:90px}
+      .mainPhoto img{min-height:260px}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+        <img src="assets/img/mecars.logo.png" alt="Mecars" />
+      </a>
+      <nav class="nav">
+        <a class="nav__link" href="index.html">Inicio</a>
+        <a class="nav__link nav__cta" href="autos.html">Stock</a>
+        <a class="nav__link" href="clientes.html">Clientes</a>
+        <a class="nav__link" href="contacto.html">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section__head" style="align-items:center">
+        <div>
+          <h2 id="title" style="margin:0">Cargando...</h2>
+          <p id="subtitle" class="muted" style="margin:6px 0 0"></p>
+        </div>
+        <a class="link" href="autos.html">← Volver al catálogo</a>
+      </div>
+
+      <section class="detail">
+        <!-- thumbs -->
+        <div class="gallery" id="thumbs"></div>
+
+        <!-- foto grande -->
+        <div class="mainPhoto">
+          <img id="mainImg" src="assets/img/placeholder.jpg" alt="Auto" />
+        </div>
+
+        <!-- info derecha -->
+        <aside class="card">
+          <div class="badge" id="badgeBrand" style="margin-bottom:10px; width:max-content">—</div>
+          <div class="price" id="price">$ Consultar</div>
+          <p class="muted" id="note" style="margin:0 0 10px">Consulta Por financiaciones</p>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
+            <a id="btnContact" class="btn btn--primary w-full" href="contacto.html">Contactar</a>
+            <button id="btnReserve" class="btn btn--ghost w-full" type="button">Reservar</button>
+          </div>
+
+          <div class="specs" id="specs"></div>
+        </aside>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <div class="brand brand--footer">Mecars<span>Multimarcas</span></div>
+        <p class="muted">Compra/venta • Consignación • Transferencias</p>
+      </div>
+      <div class="footer__links">
+        <a href="autos.html">Autos</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function money(n){
+    if (n == null || n === "" || Number(n) === 0) return "$ Consultar";
+    return Number(n).toLocaleString("es-AR", {
+      style:"currency", currency:"ARS", maximumFractionDigits:0
+    });
+  }
+
+  function esc(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;").replaceAll('"',"&quot;");
+  }
+
+  const qs = new URLSearchParams(location.search);
+  const id = qs.get("id");
+
+  if(!id){
+    $("title").textContent = "Falta el ID del auto";
+    $("subtitle").textContent = "Volvé al catálogo y elegí un vehículo.";
+  } else {
+    loadAuto(id);
+  }
+
+  async function loadAuto(id){
+    const r = await fetch("api/autos_get.php?id=" + encodeURIComponent(id), { cache:"no-store" });
+    const txt = await r.text();
+
+    let j;
+    try { j = JSON.parse(txt); }
+    catch {
+      $("title").textContent = "Error leyendo JSON";
+      $("subtitle").textContent = txt;
+      return;
+    }
+
+    if(!j.ok){
+      $("title").textContent = "No encontrado";
+      $("subtitle").textContent = j.error || "Error";
+      return;
+    }
+
+    const a = j.data;
+
+    const title = `${a.marca ?? ""} ${a.modelo ?? ""}`.trim() || "Auto";
+    $("title").textContent = title;
+    $("subtitle").textContent = `Modelo: ${a.anio ?? "—"} | ${Number(a.km ?? 0).toLocaleString("es-AR")} km`;
+
+    $("badgeBrand").textContent = a.marca ?? "—";
+    $("price").textContent = money(a.precio);
+
+    // contacto con auto preseleccionado
+    $("btnContact").href = "contacto.html?auto=" + encodeURIComponent(title);
+
+    // reservar demo (evita duplicar listener si recargas)
+    $("btnReserve").onclick = () => alert("Reserva en mantenimiento 😉");
+
+    // specs
+    const items = [
+      ["Año", a.anio],
+      ["KM", (a.km ?? "—")],
+      ["Combustible", a.combustible ?? "—"],
+      ["Transmisión", a.transmision ?? "—"],
+      ["Color", a.color ?? "—"],
+      ["Estado", a.estado ?? "—"],
+    ];
+
+    $("specs").innerHTML = items.map(([k,v]) => `
+      <div class="spec"><b>${esc(k)}</b>${esc(v ?? "—")}</div>
+    `).join("");
+
+    // =========================
+    // GALERÍA REAL (VARIAS FOTOS)
+    // =========================
+    let imgs = [];
+
+    // 1) backend nuevo: a.imagenes array
+    if (Array.isArray(a.imagenes) && a.imagenes.length > 0) {
+      imgs = a.imagenes.filter(Boolean);
+    }
+    // 2) fallback: una sola imagen
+    else if (a.imagen && String(a.imagen).trim() !== "") {
+      imgs = [String(a.imagen).trim()];
+    }
+    // 3) último fallback
+    else {
+      imgs = ["assets/img/placeholder.jpg"];
+    }
+
+    // setear principal
+    $("mainImg").src = imgs[0];
+    $("mainImg").alt = title;
+
+    // thumbs
+    $("thumbs").innerHTML = imgs.map((src, i) => `
+      <div class="thumb" data-src="${esc(src)}"
+           style="${i===0 ? "outline:2px solid rgba(255,140,26,.6)" : ""}">
+        <img src="${esc(src)}" alt="thumb">
+      </div>
+    `).join("");
+
+    // clicks
+    $("thumbs").querySelectorAll(".thumb").forEach(t => {
+      t.addEventListener("click", () => {
+        const src = t.getAttribute("data-src");
+        $("mainImg").src = src;
+
+        $("thumbs").querySelectorAll(".thumb").forEach(x => x.style.outline = "none");
+        t.style.outline = "2px solid rgba(255,140,26,.6)";
+      });
+    });
+  }
+</script>
+
+</body>
+</html>

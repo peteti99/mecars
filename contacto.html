@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contacto | Mecars</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+  <img src="assets/img/mecars.logo.png" alt="Mecars" />
+</a>
+
+
+      <nav class="nav">
+        <a class="nav__link" href="index.html">Inicio</a>
+        <a class="nav__link" href="autos.html">Stock</a>
+        <a class="nav__link" href="clientes.html">Clientes</a>
+        <a class="nav__link nav__cta" href="contacto.html">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>Contacto</h2>
+          <p class="muted" style="margin:6px 0 0">Rellena el formulario y automaticamente lo guiara hacia nuestro whatsapp</p>
+        </div>
+      </div>
+
+      <div class="contact">
+        <!-- Columna izquierda -->
+        <section class="card">
+          <h3 style="margin:0 0 10px">Escribinos</h3>
+          <p class="muted" style="margin:0 0 16px">
+            Si querés consultar por un auto específico o informacion de la financiacion, lo agregamos automáticamente al mensaje.
+          </p>
+
+          <form id="form" class="form" autocomplete="on">
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Nombre y apellido</span>
+                <input class="input" id="name" type="text" placeholder="Ej: Bruno Mera" required />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Teléfono (WhatsApp)</span>
+                <input class="input" id="phone" type="tel" placeholder="Ej: 3858 411925" required />
+              </label>
+            </div>
+
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Email (opcional)</span>
+                <input class="input" id="email" type="email" placeholder="Ej: mecars@gmail.com" />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Auto (opcional)</span>
+                <input class="input" id="car" type="text" placeholder="Ej: Volkswagen Golf 2016" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Mensaje</span>
+              <textarea class="input textarea" id="message" rows="5" placeholder="Contanos qué estás buscando..." required></textarea>
+            </label>
+
+            <div class="form__actions">
+              <button class="btn btn--primary" type="submit">Enviar por WhatsApp</button>
+              <button class="btn btn--ghost" id="clear" type="button">Limpiar</button>
+            </div>
+
+            <p class="muted" style="margin:10px 0 0; font-size:12px;">
+              *Esto abre WhatsApp con el mensaje armado.
+            </p>
+          </form>
+        </section>
+
+        <!-- Columna derecha -->
+        <aside class="card">
+          <h3 style="margin:0 0 10px">Atención</h3>
+
+          <div class="info">
+            <div class="info__item">
+              <div class="info__label">WhatsApp</div>
+              <div class="info__value" id="waShown">+54 9 3858 441644</div>
+            </div>
+            <div class="info__item">
+              <div class="info__label">Horarios</div>
+              <div class="info__value">Lun a Vie • 9:00 a 13:00 - 18:00 a 22:00 </div>
+            </div>
+            <div class="info__item">
+              <div class="info__label">Ubicación</div>
+              <div class="info__value">Termas De Rio Hondo, Santiago Del Estero</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px;">
+            <a id="waBtn" class="btn btn--primary w-full" href="#" target="_blank" rel="noopener">
+              Abrir WhatsApp
+            </a>
+            <a class="btn btn--ghost w-full" style="margin-top:10px" href="autos.html">Volver al catálogo</a>
+          </div>
+
+          <div class="mini" style="margin-top:14px;">
+            <div class="badge">✅ Respuesta rápida</div>
+            <div class="badge">📄 Consignacion</div>
+            <div class="badge">💳 Financiación</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <div class="brand brand--footer">Mecars<span>Multimarcas</span></div>
+        <p class="muted">Compra/venta • Consignación • Transferencias</p>
+      </div>
+      <div class="footer__links">
+        <a href="autos.html">Autos</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ✅ Cambiá este número por el tuyo (formato internacional SIN + ni espacios)
+    // Ej Argentina: 54911XXXXXXXX
+    const WA_NUMBER = "5493858441644";
+
+    const $ = (id) => document.getElementById(id);
+
+    function getParam(name){
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    function buildText(){
+      const name = ($("name").value || "").trim();
+      const phone = ($("phone").value || "").trim();
+      const email = ($("email").value || "").trim();
+      const car = ($("car").value || "").trim();
+      const msg = ($("message").value || "").trim();
+
+      const lines = [
+        "Hola!",
+        `Mi nombre es: ${name}`,
+        `Teléfono: ${phone}`,
+      ];
+
+      if (email) lines.push(`Email: ${email}`);
+      if (car) lines.push(`Auto de interés: ${car}`);
+
+      lines.push("", "Mensaje:", msg);
+      return lines.join("\n");
+    }
+
+    function waLink(text){
+      return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function refreshWaButton(){
+      const text = buildText();
+      $("waBtn").href = waLink(text);
+    }
+
+    // Pre-cargar auto desde autos.html?auto=...
+    const autoFromUrl = getParam("auto");
+    if (autoFromUrl) {
+      $("car").value = autoFromUrl;
+      $("message").value = `Quiero consultar por el ${autoFromUrl}. ¿Está disponible?`;
+    }
+
+    $("waShown").textContent = "+" + WA_NUMBER;
+
+    // mantener link actualizado
+    ["name","phone","email","car","message"].forEach(id => {
+      $(id).addEventListener("input", () => {
+        clearTimeout(window.__t2);
+        window.__t2 = setTimeout(refreshWaButton, 120);
+      });
+    });
+
+    $("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!$("name").value.trim() || !$("phone").value.trim() || !$("message").value.trim()){
+    alert("Completá nombre, teléfono y mensaje 🙂");
+    return;
+  }
+
+  // 1) Guardar en MySQL (lead)
+  try{
+    await fetch("api/leads_create.php", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        nombre: $("name").value.trim(),
+        telefono: $("phone").value.trim(),
+        email: $("email").value.trim(),
+        auto: $("car").value.trim(),
+        mensaje: $("message").value.trim(),
+        origen: "contacto_web"
+      })
+    });
+  }catch(e){
+    // Si falla, igual abrimos WhatsApp para no perder la venta
+    console.warn("No se pudo guardar el lead:", e);
+  }
+
+  // 2) Abrir WhatsApp como siempre
+  const link = waLink(buildText());
+  window.open(link, "_blank", "noopener");
+});
+
+
+    $("clear").addEventListener("click", () => {
+      $("name").value = "";
+      $("phone").value = "";
+      $("email").value = "";
+      $("car").value = autoFromUrl || "";
+      $("message").value = autoFromUrl
+        ? `Quiero consultar por el ${autoFromUrl}. ¿Está disponible?`
+        : "";
+      refreshWaButton();
+    });
+
+    // Inicial
+    refreshWaButton();
+  </script>
+</body>
+</html>
