@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mecars Multimarcas</title>
+  <link rel="stylesheet" href="assets/css/styles.css?v=999" />
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+        <img src="assets/img/mecars.logo.png" alt="Mecars" />
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="index.html">Inicio</a>
+        <a class="nav__link" href="autos.html">Stock</a>
+        <a class="nav__link" href="clientes.html">Clientes</a>
+        <a class="nav__link nav__cta" href="contacto.html">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__content">
+          <h1>Mecars Multimarcas, <br/>entrega rápida y segura</h1>
+          <p>Encontrá tu próximo auto con atención personalizada, historial claro y opciones de financiación.</p>
+
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="autos.html">Ver catálogo</a>
+            <a class="btn btn--ghost" href="contacto.html">Pedir cotización</a>
+          </div>
+
+          <div class="hero__stats">
+            <div class="stat">
+              <div class="stat__num">+200</div>
+              <div class="stat__label">Ventas concretadas</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num">24 hs</div>
+              <div class="stat__label">Respuesta promedio</div>
+            </div>
+            <div class="stat">
+              <div class="stat__num">100%</div>
+              <div class="stat__label">Asesoramiento</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__card">
+  <div id="heroFeatured" class="card">
+    <div class="card__tag">Destacado</div>
+    <h3>Cargando...</h3>
+    <p class="muted">—</p>
+    <div class="card__price">$ Consultar</div>
+    <a class="btn btn--primary w-full" href="contacto.html">Me interesa</a>
+  </div>
+</div>
+
+      </div>
+    </section>
+
+    <!-- ✅ ÚLTIMOS INGRESOS (DINÁMICO) -->
+    <section class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2>Últimos ingresos</h2>
+          <a class="link" href="autos.html">Ver todos →</a>
+        </div>
+
+        <!-- Antes tenías 3 cards fijas. Ahora lo llenamos desde la DB -->
+        <div id="latestGrid" class="grid"></div>
+      </div>
+    </section>
+
+    <section class="section section--soft">
+      <div class="container">
+        <div class="split">
+          <div>
+            <h2>¿Por qué elegirnos?</h2>
+            <ul class="list">
+              <li>✔️ Selección de autos con historial y verificación.</li>
+              <li>✔️ Gestión de papeles y transferencia.</li>
+              <li>✔️ Opciones de financiación (según unidad).</li>
+              <li>✔️ Atención por WhatsApp y presencial.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Atención rápida</h3>
+            <p class="muted">Dejanos tu consulta y te respondemos con disponibilidad, fotos y condiciones.</p>
+            <a class="btn btn--primary w-full" href="contacto.html">Contactar ahora</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <div class="brand brand--footer">Mecars<span>Multimarcas</span></div>
+        <p class="muted">Compra/venta • Consignación • Transferencias</p>
+      </div>
+      <div class="footer__links">
+        <a href="autos.html">Stock</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="contacto.html">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ✅ Render de "Últimos ingresos" desde la DB (últimos 3 publicados)
+    function money(n){
+      if (n == null) return "$ Consultar";
+      return Number(n).toLocaleString("es-AR", { style:"currency", currency:"ARS", maximumFractionDigits:0 });
+    }
+
+    function card(a){
+      const title = `${a.marca ?? ""} ${a.modelo ?? ""}`.trim() || (a.titulo ?? "Auto");
+      const img = (a.imagen && a.imagen !== "") ? a.imagen : "assets/img/placeholder.jpg";
+
+      const meta = [
+        a.estado ? `<span>${a.estado}</span>` : "",
+        a.color ? `<span>${a.color}</span>` : ""
+      ].filter(Boolean).join("");
+
+      return `
+        <article class="car">
+          <div class="car__img">
+            <img src="${img}" alt="${title}">
+          </div>
+          <div class="car__body">
+            <h3>${title}</h3>
+            <p class="muted">
+              ${a.anio ?? "—"} • ${(Number(a.km ?? 0)).toLocaleString("es-AR")} km • ${a.transmision ?? "—"} • ${a.combustible ?? "—"}
+            </p>
+
+            <div class="car__meta">${meta}</div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:10px 0 12px;">
+              <div style="font-weight:900; font-size:18px;">${money(a.precio)}</div>
+              <span class="badge">${a.marca ?? ""}</span>
+            </div>
+
+            <a class="btn btn--ghost w-full" href="contacto.html?auto=${encodeURIComponent(title)}">Consultar</a>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadLatest(){
+      try{
+        const r = await fetch("api/autos_list.php");
+        const j = await r.json();
+        const list = (j.data || []).slice(0, 3); // por las dudas, recorto a 3
+
+        const grid = document.getElementById("latestGrid");
+        grid.innerHTML = list.length
+          ? list.map(card).join("")
+          : `
+            <div class="card" style="grid-column:1/-1">
+              <h3 style="margin:0 0 8px">Todavía no hay autos publicados</h3>
+              <p class="muted" style="margin:0">Publicá autos desde el panel y van a aparecer acá.</p>
+            </div>
+          `;
+      } catch (e){
+        const grid = document.getElementById("latestGrid");
+        grid.innerHTML = `
+          <div class="card" style="grid-column:1/-1">
+            <h3 style="margin:0 0 8px">No se pudieron cargar los autos</h3>
+            <p class="muted" style="margin:0">Revisá que <b>api/autos_list.php</b> devuelva JSON.</p>
+          </div>
+        `;
+        console.error(e);
+      }
+    }
+
+    async function loadHeroFeatured(){
+  const box = document.getElementById("heroFeatured");
+  if(!box) return;
+
+  try{
+    const r = await fetch("api/autos_home_featured.php");
+    const j = await r.json();
+    if(!j.ok) throw new Error(j.error || "Error");
+
+    const a = j.data;
+    if(!a){
+      box.innerHTML = `
+        <div class="card__tag">Destacado</div>
+        <h3>Sin destacados</h3>
+        <p class="muted">Publicá un auto y va a aparecer acá.</p>
+        <div class="card__price"></div>
+        <a class="btn btn--primary w-full" href="autos.html">Ver catálogo</a>
+      `;
+      return;
+    }
+
+    const title = `${a.marca ?? ""} ${a.modelo ?? ""}`.trim() || "Auto";
+    const km = Number(a.km ?? 0).toLocaleString("es-AR");
+    const year = a.anio ?? "—";
+    const trans = a.transmision ?? "—";
+    const fuel = a.combustible ?? "—";
+
+    const price = (a.precio == null || a.precio === "")
+      ? "$ Consultar"
+      : Number(a.precio).toLocaleString("es-AR", {style:"currency", currency:"ARS", maximumFractionDigits:0});
+
+    box.innerHTML = `
+      <div class="card__tag">Destacado</div>
+      <h3>${title}</h3>
+      <p class="muted">${year} • ${km} km • ${trans} • ${fuel}</p>
+      <div class="card__price">${price}</div>
+      <a class="btn btn--primary w-full" href="contacto.html?auto=${encodeURIComponent(title)}">Me interesa</a>
+    `;
+  } catch(e){
+    console.error(e);
+    box.innerHTML = `
+      <div class="card__tag">Destacado</div>
+      <h3>No se pudo cargar</h3>
+      <p class="muted">${e.message}</p>
+      <div class="card__price"></div>
+      <a class="btn btn--primary w-full" href="autos.html">Ver catálogo</a>
+    `;
+  }
+}
+
+loadHeroFeatured();
+
+
+    loadLatest();
+  </script>
+</body>
+</html>
