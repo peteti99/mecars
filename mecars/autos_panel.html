@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Autos | Panel Mecars</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+        <img src="assets/img/mecars.logo.png" alt="Mecars" />
+      </a>
+      <nav class="nav">
+        <a class="nav__link" href="clientes.html">Clientes</a>
+        <a class="nav__link nav__cta" href="autos_panel.html">Stock</a>
+        <a class="nav__link" href="leads.html">Leads</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>Panel de autos</h2>
+          <p class="muted" style="margin:6px 0 0;">Cargá y publicá autos para que aparezcan en la web.</p>
+        </div>
+        <button id="logout" class="btn btn--ghost" type="button">Salir</button>
+      </div>
+
+      <section class="panel">
+        <div class="card">
+          <h3 style="margin:0 0 12px">Agregar / editar auto</h3>
+
+          <form id="form" class="form">
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Título *</span>
+                <input class="input" id="titulo" required placeholder="Ej: Volkswagen Golf 2016" />
+              </label>
+            </div>
+
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Marca *</span>
+                <input class="input" id="marca" required />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Modelo *</span>
+                <input class="input" id="modelo" required />
+              </label>
+            </div>
+
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">Año</span>
+                <input class="input" id="anio" type="number" />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Color</span>
+                <input class="input" id="color" />
+              </label>
+            </div>
+
+            <div class="form__row">
+              <label class="field">
+                <span class="field__label">KM</span>
+                <input class="input" id="km" type="number" placeholder="95000" />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Combustible</span>
+                <input class="input" id="combustible" placeholder="Nafta / Diesel / GNC" />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Transmisión</span>
+                <input class="input" id="transmision" placeholder="Manual / Automática" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field__label">Imagen (URL o ruta)</span>
+              <input class="input" id="imagen" placeholder="Ej: uploads/xxx.jpg o https://..." />
+            </label>
+
+            <div style="margin-top:10px">
+              <label class="field__label" style="display:block; margin-bottom:6px;">Imágenes (múltiples)</label>
+              <input id="imagen_file" type="file" accept="image/*" multiple />
+              <img id="preview" alt="Vista previa"
+                   style="max-width: 280px; margin-top:10px; border-radius:12px; display:none;" />
+              <p class="muted" style="margin:8px 0 0; font-size:12px;">
+                Tip: la <b>primera</b> imagen queda como portada.
+              </p>
+            </div>
+
+            <!-- GALERÍA DEL AUTO (cuando estás editando) -->
+            <div id="fotosBox" style="margin-top:14px; display:none;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                <b>Fotos del auto</b>
+                <small class="muted">Borrá una por una</small>
+              </div>
+
+              <div id="fotosGrid" style="
+                display:grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap:10px;
+                margin-top:10px;
+              "></div>
+            </div>
+
+
+            <div class="form__row" style="margin-top:12px">
+              <label class="field">
+                <span class="field__label">Precio</span>
+                <input class="input" id="precio" type="number" />
+              </label>
+
+              <label class="field">
+                <span class="field__label">Estado</span>
+                <input class="input" id="estado" placeholder="Disponible" />
+              </label>
+            </div>
+
+            <label class="field" style="flex-direction:row; align-items:center; gap:10px;">
+              <input id="publicado" type="checkbox" checked />
+              <span class="field__label" style="margin:0">Publicado</span>
+            </label>
+
+            <label class="field" style="flex-direction:row; align-items:center; gap:10px;">
+              <input id="destacado" type="checkbox" />
+              <span class="field__label" style="margin:0">Destacado (sale en el inicio)</span>
+            </label>
+
+            <div class="form__actions">
+              <button class="btn btn--primary" type="submit" id="saveBtn">Guardar auto</button>
+              <button class="btn btn--ghost" type="button" id="clear">Limpiar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="tableHead">
+            <div>
+              <h3 style="margin:0 0 6px">Listado</h3>
+              <p class="muted" style="margin:0">Editar, borrar, publicar/ocultar.</p>
+            </div>
+          </div>
+
+          <div class="tableWrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Título</th><th>Marca</th><th>Año</th><th>Precio</th><th>Pub</th><th>⭐</th><th style="width:140px">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+
+          <div id="empty" class="empty" style="display:none">
+            <h3 style="margin:0 0 8px">No hay autos</h3>
+            <p class="muted" style="margin:0">Cargá el primero desde el formulario.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const setVal = (id, v="") => { const el = $(id); if (el) el.value = v; };
+
+  let editingId = null;
+  let autos = [];
+
+  const imagenFile = $("imagen_file");
+  const preview = $("preview");
+
+  // Preview: muestra la primera imagen
+  if (imagenFile && preview) {
+    imagenFile.addEventListener("change", () => {
+      const file = imagenFile.files?.[0];
+      if (!file) { preview.style.display="none"; preview.src=""; return; }
+      preview.src = URL.createObjectURL(file);
+      preview.style.display = "block";
+    });
+  }
+
+  // Auth
+  async function ensureAuth() {
+    const r = await fetch("api/auth_me.php");
+    const j = await r.json();
+    if (!j.ok) window.location.href = "login.html";
+  }
+  ensureAuth();
+
+  function esc(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;").replaceAll('"',"&quot;");
+  }
+  function money(n){
+    if(n == null || n === "") return "";
+    return Number(n).toLocaleString("es-AR", {style:"currency", currency:"ARS", maximumFractionDigits:0});
+  }
+
+  // ========= SUBIDA MULTI (api/autos_upload.php) =========
+  async function uploadImagesIfNeeded() {
+    const files = imagenFile?.files;
+    if (!files || files.length === 0) return [];
+
+    const fd = new FormData();
+    for (const f of files) fd.append("images[]", f); // PHP: $_FILES["images"]
+
+    const r = await fetch("api/autos_upload.php", { method:"POST", body: fd });
+    const txt = await r.text();
+    console.log("UPLOAD RAW:", txt);
+
+    let j;
+    try { j = JSON.parse(txt); }
+    catch { throw new Error("autos_upload.php no devolvió JSON"); }
+
+    if (!j.ok) throw new Error(j.error || "Error subiendo imágenes");
+    return j.urls || [];
+  }
+
+  // ========= GUARDAR GALERÍA (api/autos_fotos_save.php) =========
+  async function saveGallery(autoId, urls) {
+    if (!urls || urls.length === 0) return;
+
+    const r = await fetch("api/autos_fotos_save.php", {
+      method:"POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({ auto_id: autoId, urls })
+    });
+
+    const txt = await r.text();
+    console.log("SAVE FOTOS RAW:", txt);
+
+    let j;
+    try { j = JSON.parse(txt); }
+    catch { throw new Error("autos_fotos_save.php no devolvió JSON"); }
+
+    if(!j.ok) throw new Error(j.error || "Error guardando galería");
+  }
+
+  /* CODIGO PARA BORRAR UNA FOTO DESDE EL PANEL */
+
+  async function loadFotos(autoId){
+  const r = await fetch("api/autos_fotos_list.php?id=" + encodeURIComponent(autoId), { cache:"no-store" });
+  const txt = await r.text();
+
+  let j;
+  try { j = JSON.parse(txt); }
+  catch { console.log("FOTOS LIST RAW:", txt); return []; }
+
+  if(!j.ok) return [];
+  return j.data || [];
+}
+
+async function renderFotos(autoId){
+  const box = $("fotosBox");
+  const grid = $("fotosGrid");
+  if(!box || !grid) return;
+
+  const fotos = await loadFotos(autoId);
+
+  if (!fotos.length){
+    box.style.display = "block";
+    grid.innerHTML = `<div class="muted">No hay fotos cargadas todavía.</div>`;
+    return;
+  }
+
+  box.style.display = "block";
+  grid.innerHTML = fotos.map(f => `
+    <div style="border:1px solid var(--line); border-radius:14px; overflow:hidden; background: rgba(255,255,255,.03);">
+      <div style="height:90px; background:#0b0f1a;">
+        <img src="${esc(f.url)}" style="width:100%; height:100%; object-fit:cover; display:block;">
+      </div>
+      <div style="padding:8px; display:flex; gap:8px;">
+        <button class="btn btn--ghost btn-sm w-full" data-del-foto="${f.id}">Borrar</button>
+      </div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll("[data-del-foto]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const fotoId = parseInt(btn.getAttribute("data-del-foto"), 10);
+      if(!confirm("¿Borrar esta foto?")) return;
+
+      const rr = await fetch("api/autos_fotos_delete.php", {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ foto_id: fotoId })
+      });
+
+      const t = await rr.text();
+      let jj;
+      try { jj = JSON.parse(t); }
+      catch { return alert("autos_fotos_delete.php no devolvió JSON"); }
+
+      if(!jj.ok) return alert(jj.error || "Error borrando foto");
+      await renderFotos(autoId);
+    });
+  });
+}
+
+ /* ACA TERMINA */
+
+
+  // LOAD
+  async function load() {
+    const r = await fetch("api/autos_admin_list.php", { cache: "no-store" });
+    const txt = await r.text();
+    console.log("autos_admin_list RAW:", txt);
+
+    let j;
+    try { j = JSON.parse(txt); }
+    catch { autos = []; render(); return; }
+
+    autos = j.data || [];
+    render();
+  }
+
+  function render() {
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+
+    if (autos.length === 0) {
+      $("empty").style.display = "block";
+      return;
+    }
+    $("empty").style.display = "none";
+
+    autos.forEach(a => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${a.id}</td>
+        <td>${esc(a.titulo)}</td>
+        <td>${esc(a.marca)}</td>
+        <td>${esc(a.anio ?? "")}</td>
+        <td>${esc(money(a.precio))}</td>
+        <td>${a.publicado == 1 ? "✅" : "—"}</td>
+        <td style="text-align:center">${a.destacado == 1 ? "⭐" : "—"}</td>
+        <td>
+          <div class="rowActions">
+            <button class="btn btn--ghost btn-sm" data-edit="${a.id}">Editar</button>
+            <button class="btn btn--ghost btn-sm" data-del="${a.id}">Borrar</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => {
+      const id = parseInt(b.getAttribute("data-edit"), 10);
+      const a = autos.find(x => x.id == id);
+      if(!a) return;
+
+      $("titulo").value = a.titulo || "";
+      $("marca").value = a.marca || "";
+      $("modelo").value = a.modelo || "";
+      $("anio").value = a.anio ?? "";
+      $("color").value = a.color ?? "";
+      $("km").value = a.km ?? "";
+      $("precio").value = a.precio ?? "";
+      $("combustible").value = a.combustible || "";
+      $("transmision").value = a.transmision || "";
+      $("imagen").value = a.imagen || "";
+      $("estado").value = a.estado || "Disponible";
+      $("publicado").checked = a.publicado == 1;
+      $("destacado").checked = a.destacado == 1;
+
+      editingId = id;
+      $("saveBtn").textContent = "Guardar cambios";
+      window.scrollTo({top:0, behavior:"smooth"});
+
+      renderFotos(editingId);
+
+    }));
+
+    tbody.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", async () => {
+      const id = parseInt(b.getAttribute("data-del"), 10);
+      const a = autos.find(x => x.id == id);
+      if(!a) return;
+      if(!confirm(`Borrar "${a.titulo}"?`)) return;
+
+      const r = await fetch("api/autos_delete.php", {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({id})
+      });
+
+      const txt = await r.text();
+      let j;
+      try { j = JSON.parse(txt); }
+      catch { return alert("autos_delete.php no devolvió JSON"); }
+
+      if(!j.ok) return alert(j.error || "Error");
+      await load();
+    }));
+  }
+
+  function clearForm(){
+    editingId = null;
+    ["titulo","marca","modelo","anio","color","km","combustible","transmision","imagen","precio","estado"]
+      .forEach(id => setVal(id, ""));
+    $("publicado").checked = true;
+    $("destacado").checked = false;
+    if (preview) { preview.style.display="none"; preview.src=""; }
+    if (imagenFile) imagenFile.value = "";
+    $("saveBtn").textContent = "Guardar auto";
+
+    /* ELIMINAR UNA FOTO */
+
+      if ($("fotosBox")) $("fotosBox").style.display = "none";
+      if ($("fotosGrid")) $("fotosGrid").innerHTML = "";
+
+  }
+
+  // SUBMIT (único)
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const apiBody = {
+      titulo: $("titulo").value.trim(),
+      marca: $("marca").value.trim(),
+      modelo: $("modelo").value.trim(),
+      anio: $("anio").value,
+      color: $("color").value.trim(),
+      km: $("km").value,
+      combustible: $("combustible").value.trim(),
+      transmision: $("transmision").value.trim(),
+      imagen: $("imagen").value.trim(),
+      precio: $("precio").value,
+      estado: $("estado").value.trim(),
+      publicado: $("publicado").checked ? 1 : 0,
+      destacado: $("destacado").checked ? 1 : 0
+    };
+
+    // 1) Subir imágenes seleccionadas (si hay)
+    let uploadedUrls = [];
+    try {
+      uploadedUrls = await uploadImagesIfNeeded(); // array
+    } catch (err) {
+      alert(err.message);
+      return;
+    }
+
+    // Si subió, setear portada y mandar también "imagenes" (opcional)
+    if (uploadedUrls.length) {
+      apiBody.imagen = uploadedUrls[0];  // portada
+      $("imagen").value = uploadedUrls[0];
+    }
+
+    // 2) Guardar auto (create/update)
+    const url = editingId ? "api/autos_update.php" : "api/autos_create.php";
+    const body = editingId ? { id: editingId, ...apiBody } : apiBody;
+
+    const r = await fetch(url, {
+      method:"POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(body)
+    });
+
+    const txt = await r.text();
+    console.log("SAVE RAW:", txt);
+
+    let j;
+    try { j = JSON.parse(txt); }
+    catch { return alert("El servidor no devolvió JSON. Mirá Console → SAVE RAW"); }
+
+    if(!j.ok) return alert(j.error || "Error");
+
+    // 3) Guardar galería en autos_imagenes
+    // create => j.id, update => editingId
+    const autoId = (j.id ? Number(j.id) : Number(editingId));
+
+    try {
+      // si no subiste archivos, no hace nada
+      await saveGallery(autoId, uploadedUrls);
+    } catch (err) {
+      alert("Se guardó el auto pero falló guardar la galería: " + err.message);
+    }
+
+    clearForm();
+    await load();
+  });
+
+  $("clear").addEventListener("click", clearForm);
+
+  $("logout").addEventListener("click", async () => {
+    await fetch("api/auth_logout.php");
+    window.location.href = "login.html";
+  });
+
+  load();
+</script>
+
+</body>
+</html>

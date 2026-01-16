@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leads | Panel Mecars</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a class="brand brand--logo" href="index.html">
+        <img src="assets/img/mecars-logo.png" alt="Mecars" />
+      </a>
+
+      <nav class="nav">
+        <a class="nav__link" href="clientes.html">Clientes</a>
+        <a class="nav__link nav__cta" href="leads.html">Leads</a>
+        <a class="nav__link" href="autos.html">Web</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <h2>Leads (Consultas)</h2>
+          <p class="muted" style="margin:6px 0 0;">Todas las consultas que llegan desde el contacto.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <label class="field" style="min-width:280px">
+            <span class="field__label">Buscar</span>
+            <input id="q" class="input" placeholder="Nombre, teléfono, auto, texto..." />
+          </label>
+          <button id="logout" class="btn btn--ghost" type="button">Salir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tableWrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Auto</th>
+                <th>Mensaje</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+
+        <div id="empty" class="empty" style="display:none">
+          <h3 style="margin:0 0 8px">No hay leads</h3>
+          <p class="muted" style="margin:0">Cuando alguien complete el formulario, va a aparecer acá.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function ensureAuth(){
+      try{
+        const r = await fetch("api/auth_me.php");
+        const j = await r.json();
+        if(!j.ok) throw new Error();
+      }catch(e){
+        window.location.href = "login.html";
+      }
+    }
+    ensureAuth();
+
+    const $ = (id) => document.getElementById(id);
+
+    function esc(s){
+      return (s ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;");
+    }
+
+    function fmtDT(dt){
+      if(!dt) return "";
+      // dt viene tipo "2026-01-07 12:34:56" o ISO según MySQL
+      return dt.replace("T"," ").slice(0,16);
+    }
+
+    async function load(){
+      const q = ($("q").value || "").trim();
+      const url = q ? `api/leads_list.php?q=${encodeURIComponent(q)}` : "api/leads_list.php";
+
+      const r = await fetch(url);
+      const j = await r.json();
+      if(!j.ok){
+        $("tbody").innerHTML = "";
+        $("empty").style.display = "block";
+        return;
+      }
+
+      const rows = j.data || [];
+      const tbody = $("tbody");
+      tbody.innerHTML = "";
+
+      if(rows.length === 0){
+        $("empty").style.display = "block";
+        return;
+      }
+      $("empty").style.display = "none";
+
+      rows.forEach(x => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${esc(fmtDT(x.created_at))}</td>
+          <td><div class="cellMain">${esc(x.nombre)}</div><div class="cellSub">${esc(x.origen || "")}</div></td>
+          <td>${esc(x.telefono)}</td>
+          <td>${esc(x.email || "")}</td>
+          <td>${esc(x.auto || "")}</td>
+          <td>${esc(x.mensaje || "")}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    $("q").addEventListener("input", () => {
+      clearTimeout(window.__tL);
+      window.__tL = setTimeout(load, 180);
+    });
+
+    $("logout").addEventListener("click", async () => {
+      await fetch("api/auth_logout.php");
+      window.location.href = "login.html";
+    });
+
+    load();
+  </script>
+</body>
+</html>
