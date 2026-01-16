@@ -1,10 +1,10 @@
 :root{
-  --bg:#0c0b09;              /* fondo oscuro cálido */
-  --card:#16120c;            /* tarjetas */
-  --soft:#141008;
-  --text:#fff6e8;            /* texto principal */
-  --muted:#c8b9a6;           /* texto secundario */
-  --line:rgba(255,180,80,.15);
+  --bg:#0b0f16;              /* fondo oscuro moderno */
+  --card:#111623;            /* tarjetas */
+  --soft:#0f141f;
+  --text:#f5f7ff;            /* texto principal */
+  --muted:#c0c9d6;           /* texto secundario */
+  --line:rgba(120,140,170,.2);
 
   /* 🎯 NARANJA MECARS */
   --accent:#ff8c1a;          /* naranja principal */
@@ -20,20 +20,37 @@ body{
   font-size:17px;
   line-height:1.6;
   color:var(--text);
+  position:relative;
 
   background-image:
-    radial-gradient(1200px 600px at 30% -10%, rgba(255,140,26,.18), transparent 60%),
-    radial-gradient(900px 500px at 90% 20%, rgba(255,179,71,.12), transparent 55%),
-    linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.70)),
-    url("./assets/img/bg-mecars.jpg");
+    radial-gradient(1200px 700px at 20% -20%, rgba(255,140,26,.2), transparent 60%),
+    radial-gradient(900px 600px at 85% 10%, rgba(64,124,255,.18), transparent 55%),
+    linear-gradient(to bottom, rgba(3,6,12,.6), rgba(2,4,10,.85)),
+    url("../img/bg-mecars.jpg");
 
   background-size: auto, auto, auto, cover;
-  background-position: 30% -10%, 90% 20%, center, center;
+  background-position: 20% -20%, 85% 10%, center, center;
   background-attachment: scroll, scroll, scroll, fixed;
   background-repeat: no-repeat;
 
   /* clave: mezcla overlay sin tapar */
   background-blend-mode: screen, screen, multiply, normal;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(500px 300px at 70% 30%, rgba(255,255,255,.08), transparent 70%),
+    url("../img/mecars.logo.png");
+  background-repeat:no-repeat;
+  background-size: 480px auto;
+  background-position: 75% 30%;
+  opacity:.16;
+  filter: blur(6px) saturate(1.1);
+  pointer-events:none;
+  z-index:-1;
 }
 
 
@@ -44,7 +61,7 @@ body{
 
 .header{
   position:sticky; top:0; z-index:10;
-  background: rgba(11,13,18,.65);
+  background: rgba(9,12,18,.7);
   backdrop-filter: blur(10px);
   border-bottom:1px solid var(--line);
 }
@@ -117,10 +134,10 @@ body{
 
 .card, .car{
   border:1px solid var(--line);
-  background: rgba(18,22,34,.78);
+  background: rgba(15,20,32,.82);
   border-radius:18px;
   padding:16px;
-  box-shadow: 0 10px 40px rgba(0,0,0,.35);
+  box-shadow: 0 12px 45px rgba(0,0,0,.4);
 }
 
 .card__tag{
@@ -185,7 +202,7 @@ body{
   text-decoration:none;
   color:var(--text);
   cursor:pointer;
-  background: rgba(255,255,255,.04);
+  background: rgba(255,255,255,.06);
 }
 .btn:hover{background: rgba(255,255,255,.06)}
 .btn--primary{
@@ -451,4 +468,3 @@ body::before{
 @media (max-width: 900px){
   body{ background-attachment: scroll !important; }
 }
-
